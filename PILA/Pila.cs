@@ -7,8 +7,8 @@ namespace Estructura_Datos.PILA
         }
 
     //Sirve para que metamos un elemento a la pila
-    public void Push(T elementos){
-            elementos.Add(elementos);
+    public void Push(T elemento){
+            elementos.Add(elemento);
         }
 
     //Saca el ultimo elemento de la pila
