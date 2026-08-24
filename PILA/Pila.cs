@@ -1,4 +1,4 @@
-namespace Estructura_Datos.PILA
+namespace Estructura_Datos
 {
     public class Pila<T>{
         private List<T> elementos;
