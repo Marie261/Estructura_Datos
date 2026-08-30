@@ -1,65 +1,50 @@
-#ifndef DOCUMENTO_H
-#define DOCUMENTO_H
+#ifndef DOCUMENTO_UNDO_REDO_HPP
+#define DOCUMENTO_UNDO_REDO_HPP
 
 #include <string>
-#include "Pila.h"
-#include "Operacion.h"
+#include "PilaArreglo.hpp"
 
+enum class TipoEdicion {
+    INSERTAR,
+    ELIMINAR,
+    REEMPLAZAR
+};
 
-class Documento
-{
+enum class ResultadoOperacion {
+    Exitoso,
+    NoOpPilaVacia,
+    EdicionInvalida
+};
+
+struct Operacion {
+    TipoEdicion tipo;
+    int posicion;
+    std::string textoAnterior;
+    std::string textoNuevo;
+
+    Operacion() 
+        : tipo(TipoEdicion::INSERTAR), posicion(0), textoAnterior(""), textoNuevo("") {}
+    Operacion(TipoEdicion t, int pos, std::string ant, std::string nuev) 
+        : tipo(t), posicion(pos), textoAnterior(ant), textoNuevo(nuev) {}
+};
+
+class Documento {
 private:
     std::string contenido;
-
-    Pila<Operacion> pilaDeshacer;
-    Pila<Operacion> pilaRehacer;
+    PilaArreglo<Operacion> pilaDeshacer;
+    PilaArreglo<Operacion> pilaRehacer;
 
 public:
-    Documento()
-    {
-        contenido = "";
-    } 
+    Documento();
 
-void Escribir(std::string nuevoContenido)
-{
-    Operacion operacion(contenido, nuevoContenido);
-    pilaDeshacer.Push(operacion);
-    //Cuando se hace una nueva operacio,
-    //se elimina la posibilidad de rehacer.
-    pilaRehacer.Limpiar();
+    ResultadoOperacion ejecutarEdicion(TipoEdicion tipo, int posicion, const std::string& texto);
+    ResultadoOperacion deshacer();
+    ResultadoOperacion rehacer();
 
-    contenido = nuevoContenido;
-}
-
-void Deshacer()
-{
-    if (pilaDeshacer.EstaVacia())
-    {
-        return;
-    }
-    
-    Operacion operacion = pilaDeshacer.Pop();
-    pilaRehacer.Push(operacion);
-    contenido = operacion.textoAnterior;
-}
-
-void Rehacer()
-{
-    if (pilaRehacer.EstaVacia())
-    {
-        return;
-    }
-
-    Operacion operacion = pilaRehacer.Pop();
-    pilaDeshacer.Push(operacion);
-    contenido = operacion.textoNuevo;
-}
-
-std::string ObtenerContenido()
-{
-    return contenido;
-}
-
+    std::string obtenerContenido() const { return contenido; }
+    int obtenerTamañoDeshacer() const { return pilaDeshacer.obtenerTamaño(); }
+    int obtenerTamañoRehacer() const { return pilaRehacer.obtenerTamaño(); }
+    void reiniciar();
 };
 
 #endif

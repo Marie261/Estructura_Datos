@@ -1,67 +1,83 @@
-#ifndef PILA_H
-#define PILA_H
+#ifndef PILA_ARREGLO_HPP
+#define PILA_ARREGLO_HPP
 
-#include <vector>
 #include <stdexcept>
 
-
 template <typename T>
-class Pila
-{
-    private:
-            std::vector <T> elementos;
-    
-    public: 
+class PilaArreglo {
+private: 
+    T* arreglo;
+    int capacidad;
+    int tope;
 
-    //Agrega un elemento a la pila
-    void Push(T elemento)
-    {
-        elementos.push_back(elemento);
+    void redimensionar(int nuevaCapacidad) {
+        T* nuevoArreglo = new T[nuevaCapacidad];
+        for (int i = 0; i < tope; ++i) {
+            nuevoArreglo[i] = arreglo[i];
+        }
+        delete[] arreglo;
+        arreglo = nuevoArreglo;
+        capacidad = nuevaCapacidad;
     }
 
-    //Saca el ultimo elemento de la pila
-    T Pop()
-    {
-        if(EstaVacia())
-        {
-            throw std::runtime_error("La pila esta vacia.");
+public:
+    explicit PilaArreglo(int capInicial = 10)
+        : capacidad(capInicial > 0 ? capInicial : 10), tope(0) {
+        arreglo = new T[capacidad];
+        }
+        
+        ~PilaArreglo() {
+            delete[] arreglo;
         }
 
-        T elemento = elementos.back();
-        elementos.pop_back();
-        return elemento;
-    }
-
-    //Consulta el ultimo elemento sin sacarlo
-    T Peek()
-    {
-        if(EstaVacia())
-        {
-            throw std::runtime_error("La pila esta vacia. ");
+        PilaArreglo(const PilaArreglo& otra) : capacidad(otra.capacidad), tope(otra.tope) {
+            arreglo = new T[capacidad];
+            for (int i = 0; i < tope; ++i){
+                arreglo[i] = otra.arreglo[i];
+            }
         }
 
-        return elementos.back();
-    }
+        PilaArreglo& operator=(const PilaArreglo& otra) {
+            if (this != &otra) {
+                delete[] arreglo;
+                capacidad = otra.capacidad;
+                tope = otra.tope;
+                arreglo = new T[capacidad];
+                for (int i = 0; i < tope; ++i) {
+                    arreglo[i] = otra.arreglo[i];
+                }
+            }
+            return *this;
+        }
 
+        bool estaVacia() const { return tope == 0; }
+        int obtenerTamaño() const { return tope; }
+        int obtenerCapacidad() const { return capacidad; }
 
-    //Indica si la pila esta vacia
-    bool EstaVacia()
-    {
-        return elementos.empty();
-    }
+        void apilar(const T& elemento) {
+            if (tope == capacidad) {
+                redimensionar(capacidad * 2);
+            }
+            arreglo[tope++] = elemento;
+        }
 
-    //Indica CUntoa elementos hay
-    std::size_t Tamaño()
-    {
-        return elementos.size();
-    }
+        T desapilar() {
+            if (estaVacia()) {
+                throw std::underflow_error("Error: La pila está vacía.")
+            }
+            return arreglo[--tope];
+        }
 
-    //Vacia completamente la pila
-    void Limpiar()
-    {
-        elementos.clear();
-    }
+        T obtenerTope() const {
+            if (estaVacia()) {
+                throw std::underflow_error("Error: La pila está vacía.")
+            }
+            return arreglo[tope - 1];
+        }
 
+        void limpiar() {
+            tope = 0;
+        }
 };
 
 #endif

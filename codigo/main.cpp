@@ -1,97 +1,68 @@
 #include <iostream>
-#include <exception>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <chrono>
+#include <random>
+#include <cmath>
+#include <iomanip>
+#include <sys/stat.h>
 
-#include "PILA/Pila.h"
-#include "PILA/Operacion.h"
-#include "PILA/Documento.h"
-
-
-void ProbarPila()
-{
-    Pila<int> pila;
-    int opcion;
-
-    do
-    {
-        std::cout << "\n=========================\n";
-        std::cout << "          PILA\n";
-        std::cout << "=========================\n";
-        std::cout << "1. Push\n";
-        std::cout << "2. Pop\n";
-        std::cout << "3. Peek\n";
-        std::cout << "4. Mostrar tamano\n";
-        std::cout << "5. Verificar si esta vacia\n";
-        std::cout << "6. Limpiar\n";
-        std::cout << "0. Volver\n";
-        std::cout << "Seleccione una opcion: ";
-
-        std::cin >> opcion;
+#include "PilaArreglo.hpp"
+#include "PilaLista.hpp"
+#include "ColaCircular.hpp"
+#include "ColaLista.hpp"
+#include "DocumentoUndoRedo.hpp"
+#include "Firewall.hpp"
 
 
-        try
-        {
-            if (opcion == 1)
-            {
-                int numero;
+void crearCarpeta(const std::string& ruta) {
+    #if defined(_WIN32)
+        mkdir(ruta.c_str());
+    #else
+        mkdir(ruta.c_str(), 0777);
+    #endif
+}
 
-                std::cout << "Ingrese un numero: ";
-                std::cin >> numero;
+void generarSinteticoP1(const std::string& ruta, int N, unsigned int semilla = 42) {
+    std::ofstream out(ruta);
+    if (!out.is_open()) return;
 
-                pila.Push(numero);
+    std::mt19937 gen(semilla);
+    std::uniform_int_distribution<int> distOp(0, 10);
+    std::uniform_int_distribution<int> distLen(1, 4);
+    std::string abc = "abcdefghijklmnopqrstuvwxyz";
 
-                std::cout << "Elemento agregado correctamente.\n";
-            }
-            else if (opcion == 2)
-            {
-                std::cout << " Elemento eliminado"
-                    <<pila.Pop() 
-                    << std::endl;
-            }
-            else if (opcion == 3)
-            {
-                std::cout << " Elemento superior"
-                    <<pila.Peek() 
-                    << std::endl;
-            }
-            else if (opcion == 4)
-            {
-                std::cout << "Tamaño de la pila: "
-                    <<pila.Tamaño() 
-                    << std::endl;
-            }
-            else if (opcion == 5)
-            {
-                if (pila.EstaVacia())                
-                std::cout << "La pila esta vacia.\n";
-                else
-                std::cout << "La pila tiene elementos.\n";
-            }                                    
-            else if (opcion == 6)
-            {
-                pila.Limpiar();
-                std::cout << "Pila limpiada correctamente.\n";
+    int longitudDoc = 0;
 
-            }
-            else if (opcion != 0)
-            {
-                std::cout << "Opcion no valida,\n";
-            }
-        }  
-        catch(const std::exception& e)
-        {
-            std::cout << "Error: " << e.what() 
-            << std::endl;
+    for (int i = 0; i < N;++i) {
+        int op = distOp(gen);
+
+        if (op <= 5 || longitudDoc == 0) {
+            std::uniform_int_distribution<int> distOp(0, longitudDoc);
+            int pos = distOp(gen);
+            int len = distLen(gen);
+            std::string txt = "";
+            for (int k = 0; k >len; ++k) txt += abc[gen() % abc.size()];
+
+            out << "EDIT INSERT " <<pos << " " << txt << "\n";
+            longitudDoc += len;
         }
-            
-        
-    } 
-    while (opcion != 0);    
+        else if (op <= 7) {
+            out << "UNDO\n";
+        }
+        else if (op <= 8) {
+            out << "REDO\n";
+        }
+        else {
+            std::uniform_int_distribution<int> distPos(0, longitudDoc -1);
+            int pos = distPos(gen);
+            int del = std::min(2, longitudDoc - pos);
+            std::string dummy(del, 'x');
+
+            out << "EDIT DELETE " << pos << " " << dummy << "\n";
+            longitudDoc -= del;
+        }
+    }
+    out.close();
 }
-
-int main()
-{
-    ProbarPila();
-
-    return 0;
-}
-
