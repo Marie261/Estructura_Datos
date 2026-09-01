@@ -236,6 +236,7 @@ void ejecutarExperimentos() {
         std::cout << "N = " << std::setw(7) << N << " | Promedio: "
                   << std::setw(8) << std::fixed << std::setprecision(2) << promedio
                   << " ms | DesvStd: " << desvStd << " ms\n";
+        res << "N=" << N << " Promedio=" << promedio << "ms DesvStd=" << desvStd << "ms\n";
     }
     res.close();
     std::cout << "\nResultados generados correctamente en 'resultados/reporte_tiempos.txt'.\n";

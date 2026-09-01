@@ -1,0 +1,11 @@
+---PROBLEMA 1 ---
+N=1000 Promedio=0.02296ms DesvStd=0.00587864ms
+N=10000 Promedio=0.2739ms DesvStd=0.0206111ms
+N=100000 Promedio=3.04638ms DesvStd=0.389319ms
+N=1000000 Promedio=27.004ms DesvStd=1.19245ms
+
+--- PROBLEMA 2 ---
+N=1000 Promedio=0.02266ms DesvStd=0.0047584ms
+N=10000 Promedio=0.29626ms DesvStd=0.0142154ms
+N=100000 Promedio=2.99972ms DesvStd=0.0891255ms
+N=1000000 Promedio=15.9339ms DesvStd=0.359881ms
